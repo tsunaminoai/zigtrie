@@ -16,7 +16,7 @@
         "zig build test",
       ],
       "test-watch": [
-        "watchexec --exts zig devbox run test",
+        "watchexec --exts zig --watch src --watch . devbox run test",
       ],
     },
   },
