@@ -62,6 +62,16 @@ pub fn Trie(comptime T: type) type {
             var buffer = [_]u8{0} ** 50;
             self.print_node(self.root, &buffer, 0);
         }
+
+        pub fn contains_word(self: Self, word: []const u8) bool {
+            var current_node = self.root;
+            for (word, 0..) |char, i| {
+                const index = char - 'a';
+                if (current_node.children[index]) |child| current_node = child;
+                if (i == word.len - 1) return current_node.is_word;
+            }
+            return false;
+        }
     };
 }
 
@@ -75,4 +85,7 @@ test "Trie()" {
     try t.insert_word("wine");
     try t.insert_word("wines");
     try t.print_contents();
+
+    try testing.expectEqual(t.contains_word("wine"), true);
+    try testing.expectEqual(t.contains_word("tree"), false);
 }
