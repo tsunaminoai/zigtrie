@@ -21,6 +21,8 @@ pub fn Trie(comptime T: type) type {
         arena: std.heap.ArenaAllocator,
         root: *TrieNode,
 
+        num_words: usize = 0,
+        num_nodes: usize = 0,
         const Self = @This();
 
         pub fn init(alloc: std.mem.Allocator) !Self {
@@ -45,8 +47,12 @@ pub fn Trie(comptime T: type) type {
                     const new_node = try TrieNode.init(alloc, char);
                     current_node.children[char - 'a'] = new_node;
                     current_node = new_node;
+                    self.num_nodes += 1;
                 }
-                if (i == word.len - 1) current_node.is_word = true;
+                if (i == word.len - 1) {
+                    current_node.is_word = true;
+                    self.num_words += 1;
+                }
             }
         }
         fn print_node(self: Self, node: *TrieNode, prefix: []u8, len: usize) void {

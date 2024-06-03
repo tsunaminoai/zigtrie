@@ -4,6 +4,7 @@
     "zig@0.12.0",
     "zls@latest",
     "watchexec@latest",
+    "valgrind@latest",
   ],
   "shell": {
     "init_hook": [
@@ -15,8 +16,15 @@
         "clear",
         "zig build test",
       ],
+      "run": [
+        "clear",
+        "zig build run",
+      ],
       "test-watch": [
         "watchexec --exts zig --watch src --watch . devbox run test",
+      ],
+      "run-watch": [
+        "watchexec --exts zig --watch src --watch . devbox run run",
       ],
     },
   },

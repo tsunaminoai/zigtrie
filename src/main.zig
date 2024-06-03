@@ -1,18 +1,36 @@
 const std = @import("std");
+const lib = @import("root.zig");
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const alloc = gpa.allocator();
 
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
+    var t = try lib.Trie(u8).init(alloc);
+    defer t.deinit();
+
+    var file = try std.fs.cwd().openFile("english.txt", .{});
+    defer file.close();
+
+    var reader = file.reader();
+    var idx: usize = 0;
+    blk: while (try reader.readUntilDelimiterOrEofAlloc(alloc, '\n', 100_000_000)) |word| {
+        defer alloc.free(word);
+        for (word) |char| if (char > 'z' or char < 'a') continue :blk;
+        if (idx % 1000 == 0 and idx != 0) {
+            std.debug.print("inserting: {s}{s}\r", .{ word, " " ** 20 });
+            //break :blk;
+        }
+        try t.insert_word(word[0 .. word.len - 1]);
+        idx += 1;
+    }
+    std.debug.print("\n", .{});
     const stdout_file = std.io.getStdOut().writer();
     var bw = std.io.bufferedWriter(stdout_file);
     const stdout = bw.writer();
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
-
+    try stdout.print("Trie contains {} nodes\n", .{t.num_nodes});
+    try stdout.print("Trie contains {} words\n", .{t.num_words});
     try bw.flush(); // don't forget to flush!
 }
 
