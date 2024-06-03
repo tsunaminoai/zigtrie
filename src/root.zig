@@ -52,7 +52,7 @@ pub fn Trie(comptime T: type) type {
         fn print_node(self: Self, node: *TrieNode, prefix: []u8, len: usize) void {
             prefix[len] = node.value;
             // std.debug.print("{s}", .{prefix});
-            if (node.is_word) std.debug.print("{s}\n", .{prefix});
+            if (node.is_word) std.debug.print("{s}\n", .{prefix[1..]});
             for (node.children) |child| {
                 if (child) |kid| self.print_node(kid, prefix, len + 1);
             }
@@ -73,5 +73,6 @@ test "Trie()" {
 
     try t.insert_word("wife");
     try t.insert_word("wine");
+    try t.insert_word("wines");
     try t.print_contents();
 }
