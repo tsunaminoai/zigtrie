@@ -9,7 +9,7 @@ pub fn main() !void {
     var t = try lib.Trie(u8).init(alloc);
     defer t.deinit();
 
-    var file = try std.fs.cwd().openFile("english.txt", .{});
+    var file = try std.fs.cwd().openFile("wordlists/wordlists/languages/english.txt", .{});
     defer file.close();
 
     var reader = file.reader();
@@ -17,7 +17,7 @@ pub fn main() !void {
     blk: while (try reader.readUntilDelimiterOrEofAlloc(alloc, '\n', 100_000_000)) |word| {
         defer alloc.free(word);
         for (word) |char| if (char > 'z' or char < 'a') continue :blk;
-        if (idx % 1000 == 0 and idx != 0) {
+        if (idx % 10000 == 0 and idx != 0) {
             std.debug.print("inserting: {s}{s}\r", .{ word, " " ** 20 });
             //break :blk;
         }
